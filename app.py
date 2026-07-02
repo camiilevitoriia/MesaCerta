@@ -4,7 +4,6 @@ app = Flask(__name__)
 
 comandas_db = []
 contador_id = 1 
-
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -40,6 +39,26 @@ def add_comanda():
     contador_id += 1
     
     return jsonify(nova_comanda), 201
+
+@app.route("/api/comandas/<int:id>", methods=["PUT"])
+def update_comanda(id):
+    global comandas_db
+    data = request.get_json()
+    
+    for comanda in comandas_db:
+        if comanda['id'] == id:
+            quantidade = int(data['quantidade'])
+            valor = float(data['valor'])
+            
+            comanda['cliente'] = data['cliente']
+            comanda['mesa'] = data['mesa']
+            comanda['pedido'] = data['pedido']
+            comanda['quantidade'] = quantidade
+            comanda['valor'] = valor
+            comanda['total'] = quantidade * valor # Reclacula o total
+            return jsonify(comanda), 200
+            
+    return jsonify({"mensagem": "Comanda não encontrada"}), 404
 
 @app.route("/api/comandas/<int:id>", methods=["DELETE"])
 def delete_comanda(id):

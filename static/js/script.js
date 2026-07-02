@@ -1,7 +1,11 @@
-
 const formulario = document.getElementById("formComanda");
 const mensagem = document.getElementById("mensagem");
 const corpoTabela = document.getElementById("corpoTabela");
+const btnCadastrar = document.getElementById("btnCadastrar");
+const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
+
+let idEmEdicao = null;
+let comandasAtuais = []; 
 
 
 if (corpoTabela) {
@@ -19,7 +23,6 @@ if (formulario) {
         const quantidade = document.getElementById("quantidade").value;
         const valor = document.getElementById("valor").value;
 
-        // Validação básica
         if (Number(quantidade) <= 0) {
             mostrarMensagem("A quantidade deve ser maior que zero.", false);
             return;
@@ -30,7 +33,7 @@ if (formulario) {
             return;
         }
 
-        const novaComanda = {
+        const dadosComanda = {
             cliente: cliente,
             mesa: mesa,
             pedido: pedido,
@@ -39,19 +42,33 @@ if (formulario) {
         };
 
         try {
-            // Envia para o Backend (Flask)
-            const response = await fetch('/api/comandas', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(novaComanda)
-            });
+            let response;
+            
+            if (idEmEdicao === null) {
+                response = await fetch('/api/comandas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosComanda)
+                });
+            } else {
+                response = await fetch(`/api/comandas/${idEmEdicao}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosComanda)
+                });
+            }
 
             if (response.ok) {
-                mostrarMensagem("Comanda cadastrada com sucesso!", true);
+                if (idEmEdicao === null) {
+                    mostrarMensagem("Comanda cadastrada com sucesso!", true);
+                } else {
+                    mostrarMensagem("Comanda atualizada com sucesso!", true);
+                    resetarEstadoFormulario();
+                }
                 formulario.reset();
                 atualizarTabela();
             } else {
-                mostrarMensagem("Erro ao cadastrar comanda.", false);
+                mostrarMensagem("Erro ao salvar comanda.", false);
             }
         } catch (error) {
             console.error("Erro:", error);
@@ -60,14 +77,22 @@ if (formulario) {
     });
 }
 
+if (btnCancelarEdicao) {
+    btnCancelarEdicao.addEventListener("click", function() {
+        resetarEstadoFormulario();
+        formulario.reset();
+    });
+}
+
+
 async function atualizarTabela() {
     try {
         const response = await fetch('/api/comandas');
-        const comandas = await response.json();
+        comandasAtuais = await response.json(); // Alimenta o cache local
         
         corpoTabela.innerHTML = "";
 
-        comandas.forEach(function (comanda) {
+        comandasAtuais.forEach(function (comanda) {
             corpoTabela.innerHTML += `
             <tr>
                 <td>${comanda.cliente}</td>
@@ -77,7 +102,10 @@ async function atualizarTabela() {
                 <td>R$ ${Number(comanda.valor).toFixed(2)}</td>
                 <td>R$ ${Number(comanda.total).toFixed(2)}</td>
                 <td>
-                    <button style="padding: 8px 12px; font-size: 14px;" onclick="removerComanda(${comanda.id})">
+                    <button style="padding: 8px 12px; font-size: 14px; background: #2980b9; margin-right: 5px;" onclick="prepararEdicao(${comanda.id})">
+                        Editar
+                    </button>
+                    <button style="padding: 8px 12px; font-size: 14px; background: #8B0000;" onclick="removerComanda(${comanda.id})">
                         Excluir
                     </button>
                 </td>
@@ -90,7 +118,38 @@ async function atualizarTabela() {
 }
 
 
+function prepararEdicao(id) {
+    // Procura a comanda correspondente no cache local
+    const comanda = comandasAtuais.find(c => c.id === id);
+    if (!comanda) return;
+
+    document.getElementById("cliente").value = comanda.cliente;
+    document.getElementById("mesa").value = comanda.mesa;
+    document.getElementById("pedido").value = comanda.pedido;
+    document.getElementById("quantidade").value = comanda.quantidade;
+    document.getElementById("valor").value = comanda.valor;
+
+    idEmEdicao = id;
+    btnCadastrar.textContent = "Salvar Alterações";
+    btnCancelarEdicao.style.display = "inline-block";
+
+    document.getElementById("cliente").focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetarEstadoFormulario() {
+    idEmEdicao = null;
+    btnCadastrar.textContent = "Cadastrar Comanda";
+    btnCancelarEdicao.style.display = "none";
+}
+
+
 async function removerComanda(id) {
+    if (idEmEdicao === id) {
+        alert("Não pode excluir uma comanda que está a ser editada neste momento!");
+        return;
+    }
+
     if(confirm("Tem certeza que deseja excluir esta comanda?")) {
         try {
             const response = await fetch(`/api/comandas/${id}`, {
