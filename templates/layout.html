@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Mesa Certa{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>Mesa Certa</h1>
+    <nav>
+        <!-- Os links adaptados para o Flask -->
+        <a href="{{ url_for('index') }}" style="color: white; margin-right: 15px; text-decoration: none;">Início</a>
+        <a href="{{ url_for('comandas') }}" style="color: white; text-decoration: none;">Comandas</a>
+    </nav>
+</header>
+
+{% block conteudo %}
+{% endblock %}
+
+<footer>
+    <p>© 2026 - Mesa Certa</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+# Ambiente Virtual (VENV)
+venv/
+.venv/
+env/
+ENV/
+
+# Python (Arquivos compilados e temporários)
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Configurações do Flask e Variáveis de Ambiente
+.env
+.flaskenv
+instance/
+
+# Logs do Sistema e do Selenium
+*.log
+geckodriver.log
+chromedriver.log
+
+# Configurações de IDEs (VS Code, PyCharm, etc.)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Arquivos do Sistema Operacional (Windows / Mac)
+.DS_Store
+Thumbs.db
+desktop.ini

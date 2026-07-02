@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block titulo %}Início - Mesa Certa{% endblock %}
+
+{% block conteudo %}
+<main>
+    <section class="hero">
+        <h2>Bem-vindo!</h2>
+        <p>
+            Organize as comandas do seu restaurante de maneira simples,
+            rápida e eficiente.
+        </p>
+        <div class="botoes">
+            <a href="{{ url_for('comandas') }}" class="botao">Nova Comanda</a>
+            <a href="#sobre" class="botao secundario">Sobre o Sistema</a>
+        </div>
+    </section>
+
+    <section id="sobre" class="sobre">
+        <h2>Sobre</h2>
+        <p>
+            O Mesa Certa foi desenvolvido para facilitar o cadastro de
+            pedidos em restaurantes, permitindo registrar clientes,
+            mesas, pedidos, quantidades e valores de forma organizada.
+        </p>
+
+        <div class="cards">
+            <div class="card">
+                <h3>Cadastro</h3>
+                <p>Cadastre novas comandas rapidamente.</p>
+            </div>
+            <div class="card">
+                <h3>Organização</h3>
+                <p>Visualize todas as comandas em uma tabela.</p>
+            </div>
+            <div class="card">
+                <h3>Praticidade</h3>
+                <p>O sistema calcula automaticamente o valor total.</p>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
